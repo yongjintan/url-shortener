@@ -1,7 +1,7 @@
 # URL SHORTENER
 
 # Features
-1. Allow users to paste a long url and generate a short url.
+1. Allow users to paste a long url and generate a short url. You can access it here [URL-SHORTENER-APP](https://shortalready.vercel.app/)
 
 ## Available Scripts
 
