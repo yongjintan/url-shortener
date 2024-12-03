@@ -5,8 +5,6 @@ import './UrlShortener.css';
 const UrlShortener: React.FC = () => {
     const [originalUrl, setOriginalUrl] = useState('');
     const [shortenedUrl, setShortenedUrl] = useState('');
-    const [shortString, setShortString] = useState('');
-    const [urlMap, setUrlMap] = useState<Map<string, string>>(new Map());
     const [loading, setLoading] = useState(false);
 
     const isValidUrl = (url: string): boolean => {
@@ -38,14 +36,6 @@ const UrlShortener: React.FC = () => {
             const data = response.data;
             if (data.shortUrl) {
                 setShortenedUrl(data.shortUrl);
-                const shortstring = new URL(data.shortUrl).pathname.split('/').pop();
-                setShortString(shortstring || '');
-
-                setUrlMap((prevMap) => {
-                    const updatedMap = new Map(prevMap);
-                    updatedMap.set(data.shortUrl, originalUrl);
-                    return updatedMap;
-                });
             } else {
                 throw new Error('Invalid response from server');
             }
