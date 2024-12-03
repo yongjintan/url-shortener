@@ -5,38 +5,51 @@ const UrlShortener: React.FC = () => {
     const [shortenedUrl, setShortenedUrl] = useState('');
     const [urlMap, setUrlMap] = useState<Map<string, string>>(new Map());
 
-    const handleClick = () => {
-        if (!originalUrl) {
+    const isValidUrl = (url: string): boolean => {
+        try {
+            new URL(url);
+            return true;
+        } catch {
+            return false;
+        }
+    };
+    
+
+    const handleClick = async () => {
+        if (!originalUrl || !isValidUrl(originalUrl)) {
             alert('Please enter a valid URL.');
             return;
         }
-
-        // Generate a fake shortened URL
-        const fakeShortUrl = `https://short.ly/${Math.random().toString(36).substr(2, 8)}`;
-        setShortenedUrl(fakeShortUrl);
-
-        // Store the mapping between the shortened URL and the original URL
-        setUrlMap((prevMap) => {
-            const updatedMap = new Map(prevMap);
-            updatedMap.set(fakeShortUrl, originalUrl);
-            return updatedMap;
-        });
-
-        console.log(`Original URL: ${originalUrl}, Shortened URL: ${fakeShortUrl}`);
+    
+        try {
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/api/shorten`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ longUrl: originalUrl }),
+            });
+            const data = await response.json();
+            setShortenedUrl(data.shortUrl);
+    
+            setUrlMap((prevMap) => {
+                const updatedMap = new Map(prevMap);
+                updatedMap.set(data.shortUrl, originalUrl);
+                return updatedMap;
+            });
+        } catch (error) {
+            console.error('Error shortening URL:', error);
+            alert('An error occurred while shortening the URL.');
+        }
     };
+    
 
     const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
         if (!shortenedUrl) {
             return;
         }
-
-        // Prevent default anchor behavior
         e.preventDefault();
-
-        // Retrieve the actual URL from the map and open it in a new tab
         const actualUrl = urlMap.get(shortenedUrl);
         if (actualUrl) {
-            window.open(actualUrl, '_blank'); // Open in a new tab
+            window.open(actualUrl, '_blank');
         } else {
             alert('The original URL could not be found!');
         }
