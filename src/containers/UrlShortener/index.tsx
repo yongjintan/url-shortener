@@ -1,9 +1,13 @@
 import React, { useState } from 'react';
+import axios from 'axios';
+import './UrlShortener.css';
 
 const UrlShortener: React.FC = () => {
     const [originalUrl, setOriginalUrl] = useState('');
     const [shortenedUrl, setShortenedUrl] = useState('');
+    const [shortString, setShortString] = useState('');
     const [urlMap, setUrlMap] = useState<Map<string, string>>(new Map());
+    const [loading, setLoading] = useState(false);
 
     const isValidUrl = (url: string): boolean => {
         try {
@@ -20,20 +24,22 @@ const UrlShortener: React.FC = () => {
             return;
         }
 
+        setLoading(true);
+
         try {
-            const response = await fetch(`${process.env.REACT_APP_API_URL}/api/shorten`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ longUrl: originalUrl }),
+            const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/shorten`, {
+                longUrl: originalUrl,
             });
 
-            if (!response.ok) {
+            if (response.status !== 200) {
                 throw new Error('Failed to shorten URL');
             }
 
-            const data = await response.json();
+            const data = response.data;
             if (data.shortUrl) {
                 setShortenedUrl(data.shortUrl);
+                const shortstring = new URL(data.shortUrl).pathname.split('/').pop();
+                setShortString(shortstring || '');
 
                 setUrlMap((prevMap) => {
                     const updatedMap = new Map(prevMap);
@@ -46,57 +52,42 @@ const UrlShortener: React.FC = () => {
         } catch (error) {
             console.error('Error shortening URL:', error);
             alert('An error occurred while shortening the URL.');
-        }
-    };
-
-    const handleLinkClick = async (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
-        if (!shortenedUrl) {
-            return;
-        }
-
-        e.preventDefault();
-
-        try {
-            const response = await fetch(shortenedUrl);
-            if (!response.ok) {
-                throw new Error('Failed to retrieve the original URL');
-            }
-
-            const data = await response.json();
-            const actualUrl = data.longUrl;
-            if (actualUrl) {
-                window.open(actualUrl, '_blank'); // Open in a new tab
-            } else {
-                alert('The original URL could not be found!');
-            }
-        } catch (error) {
-            console.error('Error retrieving the original URL:', error);
-            alert('An error occurred while retrieving the original URL.');
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
-        <div style={{ textAlign: 'center', marginTop: '50px' }}>
-            <h1>URL Shortener</h1>
-            <input
-                type="text"
-                placeholder="Enter URL"
-                value={originalUrl}
-                onChange={(e) => setOriginalUrl(e.target.value)}
-                style={{ padding: '8px', width: '300px', marginBottom: '10px' }}
-            />
-            <br />
-            <button onClick={handleClick} style={{ padding: '10px 20px', cursor: 'pointer', color: 'white' }}>
-                Shorten
-            </button>
-            <br />
-            <br />
+        <div className="container">
+            <h1 className="header">URL Shortener</h1>
+            <div className="input-container">
+                <input
+                    type="text"
+                    placeholder="Enter URL"
+                    value={originalUrl}
+                    onChange={(e) => setOriginalUrl(e.target.value)}
+                    className="input"
+                />
+                <br />
+                <button onClick={handleClick} className="button" disabled={loading}>
+                    {loading ? 'Shortening...' : 'Shorten'}
+                </button>
+            </div>
             {shortenedUrl && (
-                <div>
-                    <p>Shortened URL:</p>
-                    <a href={shortenedUrl} onClick={handleLinkClick}>
+                <div className="shortened-url-container">
+                    <p>Short URL:</p>
+                    <a href={shortenedUrl} target="_blank" rel="noopener noreferrer" className="shortened-url">
                         {shortenedUrl}
                     </a>
+                    <button
+                        onClick={() => {
+                            navigator.clipboard.writeText(shortenedUrl);
+                            alert('Copied to clipboard');
+                        }}
+                        className="copy-button"
+                    >
+                        Copy
+                    </button>
                 </div>
             )}
         </div>
