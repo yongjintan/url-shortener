@@ -2,6 +2,7 @@
 
 # Features
 1. Allow users to paste a long url and generate a short url. You can access it here <a href="https://shortalready.vercel.app/" target="_blank" rel="noopener noreferrer">URL-SHORTENER-APP</a>
+It is implemented using React, and deployed onto Vercel with PostgreSQL
 
 ## Available Scripts
 
