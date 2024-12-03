@@ -2,7 +2,7 @@
 
 # Features
 1. Allow users to paste a long url and generate a short url. You can access it here <a href="https://shortalready.vercel.app/" target="_blank" rel="noopener noreferrer">URL-SHORTENER-APP</a>
-It is implemented using React, and deployed onto Vercel with PostgreSQL
+It is implemented using React, and deployed with Vercel. Shortened URLs are persisted in MongoDB Atlas database.
 
 ![image](https://github.com/user-attachments/assets/c06bad0b-df69-44dd-b8a3-308e297a6a24)
 
