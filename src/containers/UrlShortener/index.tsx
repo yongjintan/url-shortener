@@ -57,7 +57,7 @@ const UrlShortener: React.FC = () => {
         e.preventDefault();
 
         try {
-            const response = await fetch(`${process.env.REACT_APP_API_URL}/api/${shortenedUrl}`);
+            const response = await fetch(shortenedUrl);
             if (!response.ok) {
                 throw new Error('Failed to retrieve the original URL');
             }
