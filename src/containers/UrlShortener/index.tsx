@@ -86,7 +86,7 @@ const UrlShortener: React.FC = () => {
                 style={{ padding: '8px', width: '300px', marginBottom: '10px' }}
             />
             <br />
-            <button onClick={handleClick} style={{ padding: '10px 20px', cursor: 'pointer' }}>
+            <button onClick={handleClick} style={{ padding: '10px 20px', cursor: 'pointer', color: 'white' }}>
                 Shorten
             </button>
             <br />
