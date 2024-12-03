@@ -22,7 +22,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "docker": "docker build . -t url-shortener"
+    "docker": "docker build . -t urlshortener"
   },
   "eslintConfig": {
     "extends": [
