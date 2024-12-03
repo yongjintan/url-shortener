@@ -13,45 +13,65 @@ const UrlShortener: React.FC = () => {
             return false;
         }
     };
-    
 
     const handleClick = async () => {
         if (!originalUrl || !isValidUrl(originalUrl)) {
             alert('Please enter a valid URL.');
             return;
         }
-    
+
         try {
             const response = await fetch(`${process.env.REACT_APP_API_URL}/api/shorten`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ longUrl: originalUrl }),
             });
+
+            if (!response.ok) {
+                throw new Error('Failed to shorten URL');
+            }
+
             const data = await response.json();
-            setShortenedUrl(data.shortUrl);
-    
-            setUrlMap((prevMap) => {
-                const updatedMap = new Map(prevMap);
-                updatedMap.set(data.shortUrl, originalUrl);
-                return updatedMap;
-            });
+            if (data.shortUrl) {
+                setShortenedUrl(data.shortUrl);
+
+                setUrlMap((prevMap) => {
+                    const updatedMap = new Map(prevMap);
+                    updatedMap.set(data.shortUrl, originalUrl);
+                    return updatedMap;
+                });
+            } else {
+                throw new Error('Invalid response from server');
+            }
         } catch (error) {
             console.error('Error shortening URL:', error);
             alert('An error occurred while shortening the URL.');
         }
     };
-    
 
-    const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
+    const handleLinkClick = async (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
         if (!shortenedUrl) {
             return;
         }
+
         e.preventDefault();
-        const actualUrl = urlMap.get(shortenedUrl);
-        if (actualUrl) {
-            window.open(actualUrl, '_blank');
-        } else {
-            alert('The original URL could not be found!');
+
+        try {
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/api/${shortenedUrl}`);
+            if (!response.ok) {
+                throw new Error('Failed to retrieve the original URL');
+            }
+
+            const data = await response.json();
+            const actualUrl = data.longUrl;
+            if (actualUrl) {
+                window.open(actualUrl, '_blank'); // Open in a new tab
+            } else {
+                alert('The original URL could not be found!');
+            }
+        } catch (error) {
+            console.error('Error retrieving the original URL:', error);
+            alert('An error occurred while retrieving the original URL.');
         }
     };
 
