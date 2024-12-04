@@ -6,6 +6,7 @@ const UrlShortener: React.FC = () => {
     const [originalUrl, setOriginalUrl] = useState('');
     const [shortenedUrl, setShortenedUrl] = useState('');
     const [loading, setLoading] = useState(false);
+    const [copyButtonText, setCopyButtonText] = useState('Copy');
 
     const isValidUrl = (url: string): boolean => {
         try {
@@ -47,6 +48,14 @@ const UrlShortener: React.FC = () => {
         }
     };
 
+    const handleCopyClick = () => {
+        navigator.clipboard.writeText(shortenedUrl);
+        setCopyButtonText('Copied!');
+        setTimeout(() => {
+            setCopyButtonText('Copy');
+        }, 2000); // Reset the button text after 2 seconds
+    };
+
     return (
         <div className="container">
             <h1 className="header">URL Shortener</h1>
@@ -69,14 +78,8 @@ const UrlShortener: React.FC = () => {
                     <a href={shortenedUrl} target="_blank" rel="noopener noreferrer" className="shortened-url">
                         {shortenedUrl}
                     </a>
-                    <button
-                        onClick={() => {
-                            navigator.clipboard.writeText(shortenedUrl);
-                            alert('Copied to clipboard');
-                        }}
-                        className="copy-button"
-                    >
-                        Copy
+                    <button onClick={handleCopyClick} className="copy-button">
+                        {copyButtonText}
                     </button>
                 </div>
             )}
