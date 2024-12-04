@@ -62,7 +62,7 @@ const UrlShortener: React.FC = () => {
             <div className="input-container">
                 <input
                     type="text"
-                    placeholder="Enter URL"
+                    placeholder="https://example.com"
                     value={originalUrl}
                     onChange={(e) => setOriginalUrl(e.target.value)}
                     className="input"
